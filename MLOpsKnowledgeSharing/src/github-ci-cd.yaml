@@ -1,0 +1,41 @@
+name: MLOps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Train model
+        run: python train.py
+      - name: Save model artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: model
+          path: model.pkl
+
+  deploy:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Download model artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: model
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-model-api .
+          docker run -p 8000:8000 my-model-api
