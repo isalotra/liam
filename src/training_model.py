@@ -22,4 +22,4 @@ with mlflow.start_run():
     mlflow.log_metric("accuracy", accuracy)
     
     # Sauvegarde du modèle
-    mlflow.sklearn.log_model(model, "random_forest_model")
+    mlflow.sklearn.log_model(model, "../mlruns/random_forest_model")
