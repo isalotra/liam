@@ -1,14 +1,21 @@
 from fastapi import FastAPI
-import pickle
-import numpy as np
+import requests
+from pydantic import BaseModel
+from typing import List
+
 
 app = FastAPI()
+MLFLOW_MODEL_URI = "http://mlflow:5000/invocations"
+print(MLFLOW_MODEL_URI)
 
-# Chargement du modèle
-with open("model.pkl", "rb") as f:
-    model = pickle.load(f)
+class DataRequest(BaseModel):
+    data: List[List[float]]  
 
 @app.post("/predict/")
-def predict(data: list):
-    prediction = model.predict(np.array(data))
-    return {"prediction": prediction.tolist()}
+def predict(request: DataRequest):
+    print(request)
+    data = request.data  
+    payload = {"instances": data}
+    response = requests.post(MLFLOW_MODEL_URI, json=payload)
+    return response.json()
+

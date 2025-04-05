@@ -1,0 +1,48 @@
+name: MLOps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: pip install -r src/requirements.txt
+      - name: Train model
+        run: python src/training_model.py
+      - name: Get MLflow run ID
+        run: |
+          # le run_id est stocké dans mlruns/{experiment_id}/{run_id}
+          RUN_ID=$(ls -d mlruns/*/* | tail -n 1 | xargs basename)
+          echo "run_id=$RUN_ID" >> $GITHUB_ENV
+          echo "Run ID: $RUN_ID"
+      - name: Upload MLflow model
+        uses: actions/upload-artifact@v3
+        with:
+          name: model
+          path: mlruns/
+
+  deploy:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Download MLflow model
+        uses: actions/download-artifact@v3
+        with:
+          name: model
+      - name: Serve model
+        run: |
+          # Utiliser la variable d'environnement RUN_ID dans le job de déploiement
+          echo "Serving model with RUN_ID: ${{ env.run_id }}"
+          mlflow models serve -m mlruns/${{ env.run_id }}/random_forest_model --port 8000
