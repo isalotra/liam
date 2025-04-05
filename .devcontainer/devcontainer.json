@@ -1,0 +1,18 @@
+{
+    "name": "MLOps Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/python:3.9",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "python.analysis.extraPaths": ["/workspace/src"]
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+    "postCreateCommand": "pip install --no-cache-dir -r /workspace/src/requirements.txt"
+}
