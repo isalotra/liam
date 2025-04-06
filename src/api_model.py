@@ -5,7 +5,7 @@ from typing import List
 
 
 app = FastAPI()
-MLFLOW_MODEL_URI = "http://mlflow:5000/invocations"
+MLFLOW_MODEL_URI = "http://localhost:5000/invocations"
 print(MLFLOW_MODEL_URI)
 
 class DataRequest(BaseModel):

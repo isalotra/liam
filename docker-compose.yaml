@@ -9,7 +9,7 @@ services:
     environment:
       - BACKEND_STORE_URI=sqlite:///mlflow.db
       - ARTIFACT_ROOT=/mlflow/artifacts
-    command: mlflow server
+    command: ["gunicorn", "--bind", "0.0.0.0:5000", "mlflow.server:app"]
     volumes:
       - mlflow-data:/mlflow
       - ./mlflow:/mlflow/artifacts
